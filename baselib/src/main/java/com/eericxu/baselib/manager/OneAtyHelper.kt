@@ -12,8 +12,8 @@ import com.eericxu.baselib.BaseComponent
 import com.eericxu.baselib.OneAty
 
 /*单Activity 的实现帮助类*/
-class OneAtyHelper(val oneAty: OneAty) {
-    val cManager = ComponentManager(oneAty)
+class OneAtyHelper(oneAty: OneAty) {
+    private val cManager = ComponentManager(oneAty)
     private val sWidth = cManager.root.resources.displayMetrics.widthPixels.toFloat()
     private val sHeight = cManager.root.resources.displayMetrics.heightPixels.toFloat()
     fun onCreateAty(savedInstanceState: Bundle?) {

@@ -2,7 +2,6 @@ package com.eericxu.baselib.manager
 
 import android.animation.Animator
 import android.content.Context
-import android.content.res.Configuration
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -34,7 +33,7 @@ class ComponentManager(oneAty: OneAty) {
         val lastElement = lastElement()
         stack.push(component)
         root.addView(component.view)
-        component.onStart()
+        component.onStart(lastElement)
         inAnim?.apply {
             setTarget(component.view)
             start()
@@ -109,8 +108,8 @@ class ComponentManager(oneAty: OneAty) {
 
     private fun removeReal(element: BaseComponent) {
         root.removeView(element.view)
-        element.onRemove()
         stack.remove(element)
+        element.onRemove(lastElement())
     }
 
     @Synchronized

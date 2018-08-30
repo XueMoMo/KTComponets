@@ -22,11 +22,15 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
 
     /**
      * addView 之后*/
-    open fun onStart() {}
+    open fun onStart(lastElement: BaseComponent?) {
+
+    }
 
     /**
      * removeView 之后*/
-    open fun onRemove() {}
+    open fun onRemove(lastElement: BaseComponent?) {
+
+    }
 
     /**
      * 状态栏高度*/
@@ -34,7 +38,7 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
         var result = 0
         val resourceId = ctx.resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
-            result = ctx.getResources().getDimensionPixelSize(resourceId)
+            result = ctx.resources.getDimensionPixelSize(resourceId)
         }
         result
     }
