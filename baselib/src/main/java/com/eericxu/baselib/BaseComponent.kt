@@ -1,6 +1,7 @@
 package com.eericxu.baselib
 
 import android.content.Context
+import android.content.res.Configuration
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,13 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
     val view: View = mView
     var oneAtyHelper = (ctx as OneAty).getHelper()
     var isRemoving: Boolean = false
+    var isShowing: Boolean = false
     private val views = SparseArray<View>()
+
+    fun screenIsPortrait(): Boolean {
+        return mView.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    }
+
     /**
      * addView 之后*/
     open fun onStart() {}

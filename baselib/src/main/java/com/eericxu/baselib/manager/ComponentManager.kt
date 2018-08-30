@@ -2,6 +2,7 @@ package com.eericxu.baselib.manager
 
 import android.animation.Animator
 import android.content.Context
+import android.content.res.Configuration
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -14,14 +15,12 @@ import java.util.*
  * 管理UI组件*/
 class ComponentManager(oneAty: OneAty) {
     private val stack = Stack<BaseComponent>()
-    private val root: FrameLayout = FrameLayout(oneAty as Context)
+    val root: FrameLayout = FrameLayout(oneAty as Context)
 
     init {
         val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         oneAty.getRoot().addView(root, 0, params)
     }
-
-    private val sWidth by lazy { (oneAty as Context).resources.displayMetrics.widthPixels.toFloat() }
 
     fun lastElement(): BaseComponent? {
         if (stack.size > 0)
@@ -70,7 +69,15 @@ class ComponentManager(oneAty: OneAty) {
         val lE = stack[stack.size - 2]
         enableComponent(lE, true)
         lastShowAnim?.apply {
+            if (lE.isShowing)
+                return
+            lE.isShowing = true
             setTarget(lE.view)
+            addListener(object : SimpleAnimLis() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    lE.isShowing = false
+                }
+            })
             start()
         }
 

@@ -1,5 +1,6 @@
 package com.eericxu.ktcomponets
 
+import android.content.res.Configuration
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.ViewGroup
@@ -63,5 +64,10 @@ class MainActivity : AppCompatActivity(), OneAty {
         if (!mHelper.back()) {
             super.onBackPressed()
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        mHelper.onConfigurationChanged(newConfig)
     }
 }
