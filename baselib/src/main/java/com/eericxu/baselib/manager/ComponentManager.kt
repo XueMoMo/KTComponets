@@ -1,7 +1,9 @@
 package com.eericxu.baselib.manager
 
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.content.Context
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -107,9 +109,10 @@ class ComponentManager(oneAty: OneAty) {
     }
 
     private fun removeReal(element: BaseComponent) {
+        val last = if (stack.size > 1) stack[stack.size - 2] else null
+        element.onRemove(last)
         root.removeView(element.view)
         stack.remove(element)
-        element.onRemove(lastElement())
     }
 
     @Synchronized
@@ -124,8 +127,24 @@ class ComponentManager(oneAty: OneAty) {
     }
 
     fun clear() {
-
+        root.removeAllViews()
     }
 
+
+    /**
+     * 左滑返回*/
+    @SuppressLint("ClickableViewAccessibility")
+    fun enableSwipeBack(enable: Boolean) {
+        if (enable) {
+            root.setOnTouchListener { v, event ->
+
+
+                true
+            }
+        } else {
+            root.setOnTouchListener(null)
+        }
+
+    }
 
 }

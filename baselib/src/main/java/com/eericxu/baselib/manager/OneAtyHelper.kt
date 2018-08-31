@@ -2,18 +2,21 @@ package com.eericxu.baselib.manager
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
-import android.app.Activity
-import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import com.eericxu.baselib.BaseComponent
 import com.eericxu.baselib.OneAty
+import com.eericxu.baselib.ui.DialogCpt
 
 /*单Activity 的实现帮助类*/
 class OneAtyHelper(oneAty: OneAty) {
     private val cManager = ComponentManager(oneAty)
+    private val mRoot = oneAty.getRoot()
     private val sWidth = cManager.root.resources.displayMetrics.widthPixels.toFloat()
     private val sHeight = cManager.root.resources.displayMetrics.heightPixels.toFloat()
     fun onCreateAty(savedInstanceState: Bundle?) {
@@ -52,7 +55,6 @@ class OneAtyHelper(oneAty: OneAty) {
     }
 
 
-
     private var screenOrientation: Int = 1
     private fun screenIsPortrait(): Boolean {
         return screenOrientation == Configuration.ORIENTATION_PORTRAIT
@@ -87,7 +89,12 @@ class OneAtyHelper(oneAty: OneAty) {
     /**
      * 移除一个组件 不传时 将移除最后启动的那个组件*/
     fun remove(component: BaseComponent? = null, anim: Animator? = defOutAnim(), lastShowAnim: Animator? = defLstShow()) {
-        cManager.remove(component, anim, lastShowAnim)
+        val element = cManager.lastElement()
+
+        if (element != null && element is DialogCpt)
+            dismiss(element)
+        else
+            cManager.remove(component, anim, lastShowAnim)
     }
 
     fun onConfigurationChanged(newConfig: Configuration?) {
@@ -95,6 +102,31 @@ class OneAtyHelper(oneAty: OneAty) {
             screenOrientation = orientation
             Log.i("OneAty:", "orientation:${newConfig.orientation}  w:$sWidth   h:$sHeight")
         }
+    }
+
+    fun show(dialogCpt: DialogCpt) {
+        mRoot.apply {
+            val cache = drawingCache
+            if (cache != null)
+                cManager.root.background = BitmapDrawable(cManager.root.resources, cache)
+            else {
+                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+                val canvas = Canvas()
+                canvas.setBitmap(bitmap)
+                draw(canvas)
+                cManager.root.background = BitmapDrawable(cManager.root.resources, bitmap)
+            }
+        }
+
+        val inAnim = ObjectAnimator.ofFloat(null, View.ALPHA, 0f, 1f)
+        inAnim.duration = 200
+        cManager.start(dialogCpt, inAnim, null)
+    }
+
+    fun dismiss(dialogCpt: DialogCpt) {
+        val outAnim = ObjectAnimator.ofFloat(null, View.ALPHA, 1f, 0f)
+        outAnim.duration = 200
+        cManager.remove(dialogCpt, outAnim, null)
     }
 
 

@@ -27,7 +27,7 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
     }
 
     /**
-     * removeView 之后*/
+     * removeView 之前*/
     open fun onRemove(lastElement: BaseComponent?) {
 
     }

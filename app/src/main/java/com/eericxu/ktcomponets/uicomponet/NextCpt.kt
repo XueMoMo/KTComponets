@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.support.v7.widget.Toolbar
 import android.widget.Button
 import com.eericxu.baselib.BaseComponent
+import com.eericxu.baselib.ui.DialogCpt
 import com.eericxu.ktcomponets.R
 
 
@@ -31,5 +32,18 @@ class NextCpt(ctx: Context, index: Int) : BaseComponent(ctx, R.layout.layout_nex
         findV<Button>(R.id.tv_input).setOnClickListener {
             oneAtyHelper.start(InputCpt(ctx))
         }
+        findV<Button>(R.id.tv_dialog).setOnClickListener {
+            clickDialog(ctx)
+        }
+    }
+
+    fun clickDialog(ctx: Context) {
+        DialogCpt(ctx)
+                .title("提示！")
+                .content("拉克丝简单快乐就好客来福单快乐就好客来福单快乐就好客来福单快乐就好客来福")
+                .tvLeft { d -> d.dismiss() }
+                .tvRight { clickDialog(ctx) }
+                .show()
+
     }
 }
