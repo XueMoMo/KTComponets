@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="swipeback_left_shade">20dp</dimen>
+</resources>

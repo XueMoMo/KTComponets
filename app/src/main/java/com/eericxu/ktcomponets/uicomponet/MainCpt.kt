@@ -19,5 +19,8 @@ class MainCpt(ctx: Context, index: Int) : BaseComponent(ctx, R.layout.layout_mai
         findV<Button>(R.id.tv_input).setOnClickListener {
             oneAtyHelper.start(InputCpt(ctx))
         }
+        findV<Button>(R.id.bt_web).setOnClickListener {
+            oneAtyHelper.start(WebCpt(ctx))
+        }
     }
 }

@@ -15,6 +15,7 @@ open class DialogCpt(ctx: Context) : BaseComponent(ctx, R.layout.layout_dialog_c
         }
         view.setOnClickListener { dismiss() }
         findV<View>(R.id.ll_layout).setOnClickListener { }
+        isSupportSwipeBack = false
     }
 
     open fun title(t: String? = null, strId: Int = 0, size: Int = 0, color: Int = 0): DialogCpt {

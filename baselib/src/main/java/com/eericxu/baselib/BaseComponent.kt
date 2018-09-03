@@ -12,8 +12,29 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
     private val mView = LayoutInflater.from(ctx).inflate(layoutId, null)
     val view: View = mView
     var oneAtyHelper = (ctx as OneAty).getHelper()
+
+    init {
+        mView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewDetachedFromWindow(v: View?) {
+                onDetachedFromWindow()
+            }
+
+            override fun onViewAttachedToWindow(v: View?) {
+                onAttachToWindow()
+            }
+
+        })
+    }
+
+    /**
+     * 移除过程中 移除动画*/
     var isRemoving: Boolean = false
+    /**
+     * 添加过程中 展示动画*/
     var isShowing: Boolean = false
+    /**
+     * 是否使用左滑返回*/
+    var isSupportSwipeBack: Boolean = true
     private val views = SparseArray<View>()
 
     fun screenIsPortrait(): Boolean {
@@ -29,6 +50,18 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
     /**
      * removeView 之前*/
     open fun onRemove(lastElement: BaseComponent?) {
+
+    }
+
+    /**
+     * 绑定到Window*/
+    open fun onAttachToWindow() {
+
+    }
+
+    /**
+     * 从Window 上移除*/
+    open fun onDetachedFromWindow() {
 
     }
 

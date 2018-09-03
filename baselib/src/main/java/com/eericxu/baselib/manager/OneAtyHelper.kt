@@ -17,8 +17,8 @@ import com.eericxu.baselib.ui.DialogCpt
 class OneAtyHelper(oneAty: OneAty) {
     private val cManager = ComponentManager(oneAty)
     private val mRoot = oneAty.getRoot()
-    private val sWidth = cManager.root.resources.displayMetrics.widthPixels.toFloat()
-    private val sHeight = cManager.root.resources.displayMetrics.heightPixels.toFloat()
+    private val sWidth = mRoot.resources.displayMetrics.widthPixels.toFloat()
+    private val sHeight = mRoot.resources.displayMetrics.heightPixels.toFloat()
     fun onCreateAty(savedInstanceState: Bundle?) {
         cManager.clear()
 
@@ -105,22 +105,9 @@ class OneAtyHelper(oneAty: OneAty) {
     }
 
     fun show(dialogCpt: DialogCpt) {
-        mRoot.apply {
-            val cache = drawingCache
-            if (cache != null)
-                cManager.root.background = BitmapDrawable(cManager.root.resources, cache)
-            else {
-                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
-                val canvas = Canvas()
-                canvas.setBitmap(bitmap)
-                draw(canvas)
-                cManager.root.background = BitmapDrawable(cManager.root.resources, bitmap)
-            }
-        }
-
         val inAnim = ObjectAnimator.ofFloat(null, View.ALPHA, 0f, 1f)
         inAnim.duration = 200
-        cManager.start(dialogCpt, inAnim, null)
+        cManager.start(dialogCpt, inAnim, null,false)
     }
 
     fun dismiss(dialogCpt: DialogCpt) {
