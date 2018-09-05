@@ -20,9 +20,10 @@ class WebCpt(ctx: Context) : BaseComponent(ctx, R.layout.layout_web) {
         }
     }
 
+
     @SuppressLint("SetJavaScriptEnabled")
-    override fun onAttachToWindow() {
-        view.postDelayed({
+    override fun onStarted() {
+        view.post {
             findV<WebView>(R.id.web).apply {
                 settings.domStorageEnabled = true
                 settings.defaultTextEncodingName = "UTF-8"
@@ -37,8 +38,7 @@ class WebCpt(ctx: Context) : BaseComponent(ctx, R.layout.layout_web) {
                 loadUrl("https://www.baidu.com")
             }
 
-        },300L)
-
+        }
     }
 
 }

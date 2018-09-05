@@ -5,7 +5,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.*
-import android.widget.FrameLayout
 import com.eericxu.baselib.BaseComponent
 import com.eericxu.baselib.OneAty
 import com.eericxu.baselib.R
@@ -43,22 +42,43 @@ class ComponentManager(oneAty: OneAty) {
         val lastElement = lastElement()
         mStack.push(component)
         mRoot.addView(component.view)
-        component.onStart(lastElement)
-        inAnim?.apply {
-            setTarget(component.view)
-            start()
-        }
-        if (lastOutAnim == null || lastElement == null)
-            enableComponent(lastElement, !hideLast)
-        else {
-            lastOutAnim.setTarget(lastElement.view)
-            lastOutAnim.addListener(object : SimpleAnimLis() {
-                override fun onAnimationEnd(animation: Animator?) {
+        component.view.alpha = 0f
+        component.view.post {
+            //启动动画
+            component.view.alpha = 1f
+            val animStart = component.animStart()
+            inAnim?.setTarget(component.view)
+            val startAnim = animStart ?: inAnim
+            if (startAnim == null) {
+                component.onStarted()
+            } else {
+                startAnim.addListener(object : SimpleAnimLis() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        component.onStarted()
+                    }
+                })
+                startAnim.start()
+            }
+
+            //隐藏动画（上一个）
+            if (lastElement != null) {
+                lastOutAnim?.setTarget(lastElement.view)
+                val outAnim = lastElement.animHide() ?: lastOutAnim
+                if (outAnim == null) {
+                    lastElement.onHide()
                     enableComponent(lastElement, !hideLast)
+                } else {
+                    outAnim.addListener(object : SimpleAnimLis() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            lastElement.onHide()
+                            enableComponent(lastElement, !hideLast)
+                        }
+                    })
+                    outAnim.start()
                 }
-            })
-            lastOutAnim.start()
+            }
         }
+
     }
 
 
@@ -70,48 +90,67 @@ class ComponentManager(oneAty: OneAty) {
     /**
      * 移除一个组件 不传时 将移除最后启动的那个组件*/
     fun remove(c: BaseComponent? = null, outAnim: Animator? = null, lastShowAnim: Animator? = null) {
-        if (mStack.size < 2)
+        if (mStack.size < 1)
             return
-        val lastElement = mStack.lastElement()
-        val element = c ?: lastElement
-        //上一个组件
+
+        val top = mStack.lastElement()
+        val element = c ?: top
+
+        //当删除的不是最顶层的时
+        if (c != null && top != c) {
+            removeReal(c)
+            return
+        }
+        if (top == null)
+            return
+        //Top之下的一个组件
         val lE = mStack[mStack.size - 2]
+
+
+        //显示动画（上一个）
         enableComponent(lE, true)
-        lastShowAnim?.apply {
-            if (lE.isShowing)
-                return
-            lE.isShowing = true
-            setTarget(lE.view)
-            addListener(object : SimpleAnimLis() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    lE.isShowing = false
-                }
-            })
-            start()
+        lastShowAnim?.setTarget(lE.view)
+        val animShow = lE.animShow() ?: lastShowAnim
+        if (animShow == null) {
+            lE.onShow()
+        } else {
+            animShow.apply {
+                if (lE.isShowing)
+                    return
+                lE.isShowing = true
+                addListener(object : SimpleAnimLis() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        lE.isShowing = false
+                        lE.onShow()
+                    }
+                })
+                start()
+            }
         }
 
-        //当前要删除的组件
-        if (outAnim == null) {
+        //移除动画
+        outAnim?.setTarget(element.view)
+        val animRemove = element.animRemove() ?: outAnim
+        if (animRemove == null) {
             removeReal(element)
         } else {
             if (element.isRemoving) {
                 return
             }
             element.isRemoving = true
-            outAnim.setTarget(element.view)
-            outAnim.addListener(object : SimpleAnimLis() {
+            animRemove.addListener(object : SimpleAnimLis() {
                 override fun onAnimationEnd(animation: Animator?) {
                     removeReal(element)
                     element.isRemoving = false
                 }
             })
-            outAnim.start()
+            animRemove.start()
         }
     }
 
     /**
      * 禁用组件*/
-    private fun enableComponent(c: BaseComponent?, enable: Boolean) {
+    fun enableComponent(c: BaseComponent?, enable: Boolean) {
 //        c?.view?.translationX = if (enable) 0f else 6000f
         c?.view?.visibility = if (enable) View.VISIBLE else View.GONE
     }
@@ -120,7 +159,7 @@ class ComponentManager(oneAty: OneAty) {
      * 从父View中移除组件*/
     private fun removeReal(element: BaseComponent) {
         val last = if (mStack.size > 1) mStack[mStack.size - 2] else null
-        element.onRemove(last)
+        element.onRemove()
         mRoot.removeView(element.view)
         mStack.remove(element)
     }

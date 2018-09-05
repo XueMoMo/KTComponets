@@ -32,6 +32,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="20dp"
         android:text="浏览器" />
+
+    <Button
+        android:id="@+id/bt_cslayot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:text="共享动画" />
 </LinearLayout>

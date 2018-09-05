@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), OneAty {
         setContentView(R.layout.activity_main)
         Toast.makeText(this, "Create", Toast.LENGTH_SHORT).show()
         mHelper.onCreateAty(savedInstanceState)
-        mHelper.start(MainCpt(this, 1), null)
+        mHelper.startT<MainCpt>(anim = null)
     }
 
     override fun onStart() {

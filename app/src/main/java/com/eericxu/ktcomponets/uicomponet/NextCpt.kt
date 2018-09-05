@@ -9,15 +9,16 @@ import com.eericxu.baselib.ui.DialogCpt
 import com.eericxu.ktcomponets.R
 
 
-class NextCpt(ctx: Context, index: Int) : BaseComponent(ctx, R.layout.layout_next) {
+class NextCpt(ctx: Context, datas: MutableMap<String, Any>) : BaseComponent(ctx, R.layout.layout_next) {
     init {
         val r = (Math.random() * 255).toInt()
         val g = (Math.random() * 255).toInt()
         val b = (Math.random() * 255).toInt()
+        val index = datas["index"] as Int
         findV<Button>(R.id.tv_content).apply {
             text = "Next:$index"
             setOnClickListener {
-                oneAtyHelper.start(NextCpt(ctx, index + 1))
+                oneAtyHelper.startT<NextCpt>(mutableMapOf("index" to index + 1))
             }
         }
         view.setBackgroundColor(Color.rgb(r, g, b))
@@ -30,7 +31,7 @@ class NextCpt(ctx: Context, index: Int) : BaseComponent(ctx, R.layout.layout_nex
             }
         }
         findV<Button>(R.id.tv_input).setOnClickListener {
-            oneAtyHelper.start(InputCpt(ctx))
+            oneAtyHelper.startT<InputCpt>()
         }
         findV<Button>(R.id.tv_dialog).setOnClickListener {
             clickDialog(ctx)

@@ -1,5 +1,6 @@
 package com.eericxu.baselib.ui
 
+import android.animation.Animator
 import android.content.Context
 import android.view.View
 import android.widget.TextView

@@ -1,5 +1,6 @@
 package com.eericxu.baselib
 
+import android.animation.Animator
 import android.content.Context
 import android.content.res.Configuration
 import android.util.SparseArray
@@ -7,16 +8,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 
-open class BaseComponent(ctx: Context, layoutId: Int) {
+open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? = null) {
+    companion object {
+        val ORIENTATION_PORTRAIT = 1
+        val ORIENTATION_LANDSCAPE = 2
+        val ORIENTATION_SENSOR = 3
+
+    }
 
     private val mView = LayoutInflater.from(ctx).inflate(layoutId, null)
     val view: View = mView
     var oneAtyHelper = (ctx as OneAty).getHelper()
+    var attach: () -> Unit = {}
+    var screenOrientation = ORIENTATION_PORTRAIT
+    private var currentOrientation = ORIENTATION_PORTRAIT
+    fun isLandscape(): Boolean {
+        return currentOrientation == ORIENTATION_LANDSCAPE
+    }
 
     init {
         mView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewDetachedFromWindow(v: View?) {
                 onDetachedFromWindow()
+                attach()
             }
 
             override fun onViewAttachedToWindow(v: View?) {
@@ -41,17 +55,34 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
         return mView.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     }
 
+    /*启动动画*/
+    open fun animStart(): Animator? = null
+
+    /*移除动画*/
+    open fun animRemove(): Animator? = null
+
+    /*隐藏动画*/
+    open fun animHide(): Animator? = null
+
+    /*显示动画*/
+    open fun animShow(): Animator? = null
+
     /**
      * addView 之后*/
-    open fun onStart(lastElement: BaseComponent?) {
-
-    }
+    open fun onStarted() {}
 
     /**
      * removeView 之前*/
-    open fun onRemove(lastElement: BaseComponent?) {
+    open fun onRemove() {}
 
-    }
+    /**
+     * 展示*/
+    open fun onShow() {}
+
+    /**
+     * 隐藏*/
+    open fun onHide() {}
+
 
     /**
      * 绑定到Window*/
@@ -95,6 +126,11 @@ open class BaseComponent(ctx: Context, layoutId: Int) {
             Toast.makeText(mView.context, msg, Toast.LENGTH_SHORT).show()
         else
             Toast.makeText(mView.context, msgId, Toast.LENGTH_SHORT).show()
+    }
+
+
+    fun visible(visible: Boolean) {
+        view.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
 
