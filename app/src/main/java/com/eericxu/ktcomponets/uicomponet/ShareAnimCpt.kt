@@ -57,7 +57,7 @@ class ShareAnimCpt(ctx: Context) : BaseComponent(ctx, R.layout.layout_share_anim
                     createKeyParm("csLayout", csL).apply { map[key] = this }
                     createKeyParm("ivCover", helper.getView(R.id.iv_cover)).apply { map[key] = this }
                     createKeyParm("tvTit", helper.getView(R.id.tv_tit)).apply { map[key] = this }
-                    oneAtyHelper.startT<ShareAnimDetailCpt>(map, null, null, false)
+                    oneAtyHelper?.startT<ShareAnimDetailCpt>(map, null, null, false)
                 }
 
             }

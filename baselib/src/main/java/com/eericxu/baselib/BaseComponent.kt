@@ -7,8 +7,20 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import com.eericxu.baselib.manager.OneAtyHelper
+import com.eericxu.baselib.utils.toOneAty
 
-open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? = null) {
+open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? = null) : View.OnAttachStateChangeListener {
+    var mDatas = datas
+    override fun onViewDetachedFromWindow(v: View?) {
+        onDetachedFromWindow()
+        attach()
+    }
+
+    override fun onViewAttachedToWindow(v: View?) {
+        onAttachToWindow()
+    }
+
     companion object {
         val ORIENTATION_PORTRAIT = 1
         val ORIENTATION_LANDSCAPE = 2
@@ -18,7 +30,7 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
 
     private val mView = LayoutInflater.from(ctx).inflate(layoutId, null)
     val view: View = mView
-    var oneAtyHelper = (ctx as OneAty).getHelper()
+    var oneAtyHelper:OneAtyHelper? = ctx.toOneAty()?.getHelper()
     var attach: () -> Unit = {}
     var screenOrientation = ORIENTATION_PORTRAIT
     private var currentOrientation = ORIENTATION_PORTRAIT
@@ -26,19 +38,6 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
         return currentOrientation == ORIENTATION_LANDSCAPE
     }
 
-    init {
-        mView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewDetachedFromWindow(v: View?) {
-                onDetachedFromWindow()
-                attach()
-            }
-
-            override fun onViewAttachedToWindow(v: View?) {
-                onAttachToWindow()
-            }
-
-        })
-    }
 
     /**
      * 移除过程中 移除动画*/
@@ -69,11 +68,25 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
 
     /**
      * addView 之后*/
-    open fun onStarted() {}
+    open fun onStarted() {
+        mView.addOnAttachStateChangeListener(this)
+    }
 
     /**
      * removeView 之前*/
-    open fun onRemove() {}
+    open fun onRemove() {
+        oneAtyHelper = null
+        mDatas = null
+        for (i in 0..views.size()) {
+            val keyAt = views.keyAt(i)
+            val get = views.get(keyAt)
+            get?.setOnClickListener(null)
+            get?.setOnLongClickListener(null)
+            get?.setOnTouchListener(null)
+        }
+        views.clear()
+        mView.removeOnAttachStateChangeListener(this)
+    }
 
     /**
      * 展示*/

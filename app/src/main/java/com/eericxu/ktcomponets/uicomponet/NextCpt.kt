@@ -9,36 +9,43 @@ import com.eericxu.baselib.ui.DialogCpt
 import com.eericxu.ktcomponets.R
 
 
-class NextCpt(ctx: Context, datas: MutableMap<String, Any>) : BaseComponent(ctx, R.layout.layout_next) {
+class NextCpt(ctx: Context, datas: MutableMap<String, Any>) : BaseComponent(ctx, R.layout.layout_next,datas) {
+
+    val index = mDatas?.get("index") as Int
     init {
+
         val r = (Math.random() * 255).toInt()
         val g = (Math.random() * 255).toInt()
         val b = (Math.random() * 255).toInt()
-        val index = datas["index"] as Int
-        findV<Button>(R.id.tv_content).apply {
-            text = "Next:$index"
-            setOnClickListener {
-                oneAtyHelper.startT<NextCpt>(mutableMapOf("index" to index + 1))
-            }
-        }
-        view.setBackgroundColor(Color.rgb(r, g, b))
 
-        findV<Toolbar>(R.id.t_bar).apply {
-            setPadding(0, statusHeight, 0, 0)
-            title = "KTCoomponents:$index"
-            setNavigationOnClickListener {
-                oneAtyHelper.remove()
-            }
+        view.setBackgroundColor(Color.rgb(r, g, b))
+        findV<Toolbar>(R.id.t_bar).setPadding(0, statusHeight, 0, 0)
+        findV<Toolbar>(R.id.t_bar).title =  "KTCoomponents:${index}"
+
+    }
+
+    override fun onStarted() {
+        super.onStarted()
+
+        findV<Button>(R.id.tv_content).setOnClickListener {
+            oneAtyHelper?.startT<NextCpt>(mutableMapOf("index" to index + 1))
+        }
+        findV<Toolbar>(R.id.t_bar).setNavigationOnClickListener {
+            oneAtyHelper?.remove()
         }
         findV<Button>(R.id.tv_input).setOnClickListener {
-            oneAtyHelper.startT<InputCpt>()
+            oneAtyHelper?.startT<InputCpt>()
         }
         findV<Button>(R.id.tv_dialog).setOnClickListener {
-            clickDialog(ctx)
+            clickDialog(it.context)
         }
     }
 
-    fun clickDialog(ctx: Context) {
+    override fun onRemove() {
+        findV<Toolbar>(R.id.t_bar).setNavigationOnClickListener(null)
+        super.onRemove()
+    }
+    private fun clickDialog(ctx: Context) {
         DialogCpt(ctx)
                 .title("提示！")
                 .content("拉克丝简单快乐就好客来福单快乐就好客来福单快乐就好客来福单快乐就好客来福")

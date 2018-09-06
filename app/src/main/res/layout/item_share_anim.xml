@@ -8,7 +8,6 @@
     android:layout_marginTop="50dp"
     app:cs_clip="15dp"
     app:cs_corner="15dp"
-    app:cs_shadow_size="15dp"
     app:layout_constraintTop_toTopOf="parent">
 
     <ImageView

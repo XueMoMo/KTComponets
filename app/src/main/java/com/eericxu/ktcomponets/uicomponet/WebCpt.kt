@@ -15,7 +15,7 @@ class WebCpt(ctx: Context) : BaseComponent(ctx, R.layout.layout_web) {
         findV<Toolbar>(R.id.t_bar).apply {
             setPadding(0, statusHeight, 0, 0)
             setNavigationOnClickListener {
-                oneAtyHelper.remove()
+                oneAtyHelper?.remove()
             }
         }
     }

@@ -4,19 +4,19 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
 import com.eericxu.baselib.BaseComponent
 import com.eericxu.baselib.OneAty
 import com.eericxu.baselib.R
 import com.eericxu.baselib.anim.SimpleAnimLis
-import java.util.*
 
 /**
  * 管理UI组件*/
 class ComponentManager(oneAty: OneAty) {
     /**
-     * 保存组件引用的栈 FIFO*/
-    private val mStack = Stack<BaseComponent>()
+     * 保存组件引用 */
+    private val mStack = ArrayList<BaseComponent>()
     /**
      * 所有组件的父View */
     private val mRoot: MRoot = MRoot(oneAty as Context)
@@ -32,7 +32,7 @@ class ComponentManager(oneAty: OneAty) {
      * 当前顶层组件*/
     fun lastElement(): BaseComponent? {
         if (mStack.size > 0)
-            return mStack.lastElement()
+            return mStack.last()
         return null
     }
 
@@ -40,7 +40,7 @@ class ComponentManager(oneAty: OneAty) {
      * 启动一个组件*/
     fun start(component: BaseComponent, inAnim: Animator? = null, lastOutAnim: Animator? = null, hideLast: Boolean = true) {
         val lastElement = lastElement()
-        mStack.push(component)
+        mStack.add(component)
         mRoot.addView(component.view)
         component.view.alpha = 0f
         component.view.post {
@@ -54,6 +54,7 @@ class ComponentManager(oneAty: OneAty) {
             } else {
                 startAnim.addListener(object : SimpleAnimLis() {
                     override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
                         component.onStarted()
                     }
                 })
@@ -70,6 +71,7 @@ class ComponentManager(oneAty: OneAty) {
                 } else {
                     outAnim.addListener(object : SimpleAnimLis() {
                         override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
                             lastElement.onHide()
                             enableComponent(lastElement, !hideLast)
                         }
@@ -93,7 +95,7 @@ class ComponentManager(oneAty: OneAty) {
         if (mStack.size < 1)
             return
 
-        val top = mStack.lastElement()
+        val top = mStack.last()
         val element = c ?: top
 
         //当删除的不是最顶层的时
@@ -101,8 +103,6 @@ class ComponentManager(oneAty: OneAty) {
             removeReal(c)
             return
         }
-        if (top == null)
-            return
         //Top之下的一个组件
         val lE = mStack[mStack.size - 2]
 
@@ -120,6 +120,7 @@ class ComponentManager(oneAty: OneAty) {
                 lE.isShowing = true
                 addListener(object : SimpleAnimLis() {
                     override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
                         lE.isShowing = false
                         lE.onShow()
                     }
@@ -140,8 +141,9 @@ class ComponentManager(oneAty: OneAty) {
             element.isRemoving = true
             animRemove.addListener(object : SimpleAnimLis() {
                 override fun onAnimationEnd(animation: Animator?) {
-                    removeReal(element)
+                    super.onAnimationEnd(animation)
                     element.isRemoving = false
+                    removeReal(element)
                 }
             })
             animRemove.start()
@@ -162,6 +164,8 @@ class ComponentManager(oneAty: OneAty) {
         element.onRemove()
         mRoot.removeView(element.view)
         mStack.remove(element)
+//        System.runFinalization()
+//        System.gc()
     }
 
     @Synchronized //未完成
@@ -208,52 +212,51 @@ class ComponentManager(oneAty: OneAty) {
      * 结束滑动时*/
     private fun endMoveTarget() {
         startMove = false
-        moveTarget?.apply {
-            val transX = view.translationX
-            val end = if (transX > (view.width / 3)) {
-                view.width.toFloat()
-            } else {
-                0f
-            }
-
-            val anim = ValueAnimator.ofFloat(transX, end)
-            anim.duration = 200
-            anim.addUpdateListener {
-                val value = it.animatedValue as Float
-                view.translationX = value
-                lastTarget?.let { it.view.translationX = (value - it.view.width) / 2 }
-            }
-            anim.addListener(object : SimpleAnimLis() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    if (end == 0f) {
-                        enableComponent(lastTarget, false)
-                        moveTarget?.view?.translationZ = 0f
-                    } else {
-                        moveTarget?.let { removeReal(it) }
-                    }
-                    moveTarget = null
-                    lastTarget = null
+        val target = moveTarget ?: return
+        val transX = target.view.translationX
+        val end =
+                if (transX > (target.view.width / 3)) {
+                    target.view.width.toFloat()
+                } else {
+                    0f
                 }
-            })
-            anim.start()
-        }
 
+        val anim = ValueAnimator.ofFloat(transX, end)
+        anim.duration = 200
+        anim.addUpdateListener {
+            val value = it.animatedValue as Float
+            target.view.translationX = value
+            val lastView = lastTarget?.view ?: return@addUpdateListener
+            lastView.translationX = (value - lastView.width) / 2
+        }
+        anim.addListener(object : SimpleAnimLis() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                if (end == 0f) {
+                    enableComponent(lastTarget, false)
+                    moveTarget?.view?.translationZ = 0f
+                } else {
+                    moveTarget?.let { removeReal(it) }
+                }
+                moveTarget = null
+                lastTarget = null
+            }
+        })
+        anim.start()
     }
 
     /**
      * 开始滑动时*/
     private fun startMoveTarget() {
         if (mStack.size > 1) {
-            val lastElement = mStack.lastElement()
+            val lastElement = mStack.last()
             if (lastElement.isSupportSwipeBack) {
                 moveTarget = lastElement
                 lastElement.view.translationZ = shader
                 val component = mStack[mStack.size - 2]
-                component?.apply {
-                    view.visibility = View.VISIBLE
-                    view.translationX = -view.width * 0.5f
-                    lastTarget = component
-                }
+                component.view.visibility = View.VISIBLE
+                component.view.translationX = -component.view.width * 0.5f
+                lastTarget = component
             }
         }
     }
@@ -261,7 +264,7 @@ class ComponentManager(oneAty: OneAty) {
     /**
      * 滑动过程中*/
     private fun moveTarget(offX: Float) {
-        moveTarget?.apply { view.translationX = offX }
+        moveTarget?.view?.translationX = offX
         lastTarget?.apply { view.translationX = (offX - view.width) / 2 }
     }
 

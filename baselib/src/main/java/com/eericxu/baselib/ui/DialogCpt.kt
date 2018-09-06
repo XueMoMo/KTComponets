@@ -1,6 +1,5 @@
 package com.eericxu.baselib.ui
 
-import android.animation.Animator
 import android.content.Context
 import android.view.View
 import android.widget.TextView
@@ -56,11 +55,11 @@ open class DialogCpt(ctx: Context) : BaseComponent(ctx, R.layout.layout_dialog_c
     }
 
     fun show() {
-        oneAtyHelper.show(this)
+        oneAtyHelper?.show(this)
     }
 
     fun dismiss() {
-        oneAtyHelper.dismiss(this)
+        oneAtyHelper?.dismiss(this)
     }
 
 
