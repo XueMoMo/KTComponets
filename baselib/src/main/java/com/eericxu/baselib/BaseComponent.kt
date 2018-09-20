@@ -30,7 +30,7 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
 
     private val mView = LayoutInflater.from(ctx).inflate(layoutId, null)
     val view: View = mView
-    var oneAtyHelper:OneAtyHelper? = ctx.toOneAty()?.getHelper()
+    var oneAtyHelper: OneAtyHelper? = ctx.toOneAty()?.getHelper()
     var attach: () -> Unit = {}
     var screenOrientation = ORIENTATION_PORTRAIT
     private var currentOrientation = ORIENTATION_PORTRAIT
@@ -60,10 +60,10 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
     /*移除动画*/
     open fun animRemove(): Animator? = null
 
-    /*隐藏动画*/
+    /*隐藏动画 被新的覆盖时*/
     open fun animHide(): Animator? = null
 
-    /*显示动画*/
+    /*显示动画 移除最上层时*/
     open fun animShow(): Animator? = null
 
     /**
@@ -89,11 +89,11 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
     }
 
     /**
-     * 展示*/
+     * 展示 再次展示*/
     open fun onShow() {}
 
     /**
-     * 隐藏*/
+     * 隐藏 被新的覆盖*/
     open fun onHide() {}
 
 
@@ -144,6 +144,10 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
 
     fun visible(visible: Boolean) {
         view.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    fun finish() {
+        oneAtyHelper?.remove(this)
     }
 
 

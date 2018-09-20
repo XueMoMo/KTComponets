@@ -92,10 +92,10 @@ class OneAtyHelper(oneAty: OneAty) {
      * return  true 回退成功  false 回退失败*/
     fun back(): Boolean {
         if (cManager.canBack()) {
-            remove()
+            cManager.lastElement()?.finish()
             return true
         }
-        return false
+        return cManager.back()
     }
 
 

@@ -15,9 +15,9 @@ class MRoot : FrameLayout {
     var useSwipeBack = false
     private val xLeft by lazy { context.resources.displayMetrics.widthPixels / 10f }//左侧开始区域
     private var startMove = false
-    var onStartMove: () -> Unit = {}
-    var onMove: (Float) -> Unit = {}
-    var onMoveEnd: () -> Unit = {}
+    var onStartMove: (() -> Unit)? = {}
+    var onMove: ((Float) -> Unit)? = {}
+    var onMoveEnd: (() -> Unit)? = {}
 
     var xD = 0f
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
@@ -56,8 +56,8 @@ class MRoot : FrameLayout {
                 val xOff = xM - xD
                 if (xD < xLeft && xOff > 0) {
                     if (!startMove)
-                        onStartMove()
-                    onMove(xOff)
+                        onStartMove?.invoke()
+                    onMove?.invoke(xOff)
                     startMove = true
                     touch = true
                 }
@@ -65,7 +65,7 @@ class MRoot : FrameLayout {
 
             MotionEvent.ACTION_UP -> {
                 startMove = false
-                onMoveEnd()
+                onMoveEnd?.invoke()
             }
         }
         return touch

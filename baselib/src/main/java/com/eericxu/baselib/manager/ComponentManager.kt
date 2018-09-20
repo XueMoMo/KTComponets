@@ -15,7 +15,7 @@ import com.eericxu.baselib.anim.SimpleAnimLis
  * 管理UI组件*/
 class ComponentManager(oneAty: OneAty) {
     /**
-     * 保存组件引用 */
+     * 按顺序保存组件 */
     private val mStack = ArrayList<BaseComponent>()
     /**
      * 所有组件的父View */
@@ -114,19 +114,17 @@ class ComponentManager(oneAty: OneAty) {
         if (animShow == null) {
             lE.onShow()
         } else {
-            animShow.apply {
-                if (lE.isShowing)
-                    return
-                lE.isShowing = true
-                addListener(object : SimpleAnimLis() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                        lE.isShowing = false
-                        lE.onShow()
-                    }
-                })
-                start()
-            }
+            if (lE.isShowing)
+                return
+            lE.isShowing = true
+            animShow.addListener(object : SimpleAnimLis() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    lE.isShowing = false
+                    lE.onShow()
+                }
+            })
+            animShow.start()
         }
 
         //移除动画
@@ -151,16 +149,17 @@ class ComponentManager(oneAty: OneAty) {
     }
 
     /**
-     * 禁用组件*/
+     * 禁用组件 就是将组件的隐藏*/
     fun enableComponent(c: BaseComponent?, enable: Boolean) {
-//        c?.view?.translationX = if (enable) 0f else 6000f
-        c?.view?.visibility = if (enable) View.VISIBLE else View.GONE
+        c?.visible(enable)
     }
 
     /**
      * 从父View中移除组件*/
-    private fun removeReal(element: BaseComponent) {
-        val last = if (mStack.size > 1) mStack[mStack.size - 2] else null
+    private fun removeReal(element: BaseComponent?) {
+        if (element == null)
+            return
+//        val last = if (mStack.size > 1) mStack[mStack.size - 2] else null
         element.onRemove()
         mRoot.removeView(element.view)
         mStack.remove(element)
@@ -177,6 +176,15 @@ class ComponentManager(oneAty: OneAty) {
      * 是否可以回退栈*/
     fun canBack(): Boolean {
         return mStack.size > 1
+    }
+
+    fun back(): Boolean {
+        if (canBack()) {
+            remove(lastTarget, null, null)
+            return true
+        } else {
+            return false
+        }
     }
 
     /**
@@ -236,7 +244,7 @@ class ComponentManager(oneAty: OneAty) {
                     enableComponent(lastTarget, false)
                     moveTarget?.view?.translationZ = 0f
                 } else {
-                    moveTarget?.let { removeReal(it) }
+                    removeReal(moveTarget)
                 }
                 moveTarget = null
                 lastTarget = null
@@ -265,7 +273,7 @@ class ComponentManager(oneAty: OneAty) {
      * 滑动过程中*/
     private fun moveTarget(offX: Float) {
         moveTarget?.view?.translationX = offX
-        lastTarget?.apply { view.translationX = (offX - view.width) / 2 }
+        lastTarget?.view?.translationX = (offX - moveTarget?.view?.width!!) / 2
     }
 
 }
