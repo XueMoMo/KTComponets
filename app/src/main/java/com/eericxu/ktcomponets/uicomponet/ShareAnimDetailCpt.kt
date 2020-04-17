@@ -12,21 +12,21 @@ import com.eericxu.baselib.BaseComponent
 import com.eericxu.cslibrary.*
 import com.eericxu.cslibrary.anim.CSViewAnim
 import com.eericxu.cslibrary.anim.ViewAnim
-import com.eericxu.cslibrary.keyparms.CSKeyParm
-import com.eericxu.cslibrary.keyparms.KeyParm
+import com.eericxu.cslibrary.keyparms.CSKeyParams
+import com.eericxu.cslibrary.keyparms.KeyParams
 import com.eericxu.ktcomponets.R
 
 class ShareAnimDetailCpt(ctx: Context, val datas: Map<String, Any> = mutableMapOf())
     : BaseComponent(ctx, R.layout.layout_share_anim_del, datas) {
 
 
-    fun createAnimator(isStart: Boolean, keyParm: KeyParm, v: View,
+    fun createAnimator(isStart: Boolean, keyParm: KeyParams, v: View,
                        duration: Long = 600,
                        interpolator: Interpolator = OffsetInterpolator()
     ): Animator {
         val anim: Animator = when (v) {
-            is CSInterface -> CSViewAnim(isStart, v, keyParm as CSKeyParm, CSKeyParm(keyParm.key, v.rectInWindow(), CSParms()))
-            else -> ViewAnim(isStart, v, keyParm, KeyParm(keyParm.key, v.rectInWindow()))
+            is CSInterface -> CSViewAnim(isStart, v, keyParm as CSKeyParams, CSKeyParams(keyParm.key, v.rectInWindow(), CSParms()))
+            else -> ViewAnim(isStart, v, keyParm, KeyParams(keyParm.key, v.rectInWindow()))
         }
         anim.duration = duration
         anim.interpolator = interpolator
@@ -49,9 +49,9 @@ class ShareAnimDetailCpt(ctx: Context, val datas: Map<String, Any> = mutableMapO
     override fun animStart(): Animator? {
         val set = AnimatorSet()
         set.playTogether(
-                createAnimator(true, datas["csLayout"] as CSKeyParm, view as CSLayout),
-                createAnimator(true, datas["ivCover"] as KeyParm, findV(R.id.iv_cover)),
-                createAnimator(true, datas["tvTit"] as KeyParm, findV(R.id.tv_tit))
+                createAnimator(true, datas["csLayout"] as CSKeyParams, view as CSLayout),
+                createAnimator(true, datas["ivCover"] as KeyParams, findV(R.id.iv_cover)),
+                createAnimator(true, datas["tvTit"] as KeyParams, findV(R.id.tv_tit))
         )
         return set
     }
@@ -59,9 +59,9 @@ class ShareAnimDetailCpt(ctx: Context, val datas: Map<String, Any> = mutableMapO
     override fun animRemove(): Animator? {
         val set = AnimatorSet()
         set.playTogether(
-                createAnimator(false, datas["csLayout"] as CSKeyParm, view as CSLayout),
-                createAnimator(false, datas["ivCover"] as KeyParm, findV(R.id.iv_cover)),
-                createAnimator(false, datas["tvTit"] as KeyParm, findV(R.id.tv_tit))
+                createAnimator(false, datas["csLayout"] as CSKeyParams, view as CSLayout),
+                createAnimator(false, datas["ivCover"] as KeyParams, findV(R.id.iv_cover)),
+                createAnimator(false, datas["tvTit"] as KeyParams, findV(R.id.tv_tit))
         )
         return set
     }

@@ -2,14 +2,14 @@ package com.eericxu.ktcomponets.uicomponet
 
 import android.content.Context
 import android.graphics.Color
-import android.support.v7.widget.Toolbar
 import android.widget.Button
+import android.widget.Toolbar
 import com.eericxu.baselib.BaseComponent
 import com.eericxu.baselib.ui.DialogCpt
 import com.eericxu.ktcomponets.R
 
 
-class NextCpt(ctx: Context, datas: MutableMap<String, Any>) : BaseComponent(ctx, R.layout.layout_next,datas) {
+class NextCpt(ctx: Context, datas: MutableMap<String, Any>? = null) : BaseComponent(ctx, R.layout.layout_next,datas) {
 
     val index = mDatas?.get("index") as Int
     init {

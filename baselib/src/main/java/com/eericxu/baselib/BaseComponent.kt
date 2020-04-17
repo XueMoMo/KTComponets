@@ -10,6 +10,7 @@ import android.widget.Toast
 import com.eericxu.baselib.manager.OneAtyHelper
 import com.eericxu.baselib.utils.toOneAty
 
+@Suppress("UNCHECKED_CAST")
 open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? = null) : View.OnAttachStateChangeListener {
     var mDatas = datas
     override fun onViewDetachedFromWindow(v: View?) {
@@ -77,7 +78,7 @@ open class BaseComponent(ctx: Context, layoutId: Int, datas: Map<String, Any>? =
     open fun onRemove() {
         oneAtyHelper = null
         mDatas = null
-        for (i in 0..views.size()) {
+        for (i in 0 until views.size()) {
             val keyAt = views.keyAt(i)
             val get = views.get(keyAt)
             get?.setOnClickListener(null)

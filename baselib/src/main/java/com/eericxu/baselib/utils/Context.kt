@@ -6,7 +6,7 @@ import android.view.ContextThemeWrapper
 import com.eericxu.baselib.OneAty
 
 
-inline fun Context.toOneAty(): OneAty? {
+fun Context.toOneAty(): OneAty? {
     return when (this) {
         is OneAty -> this
         is ContextWrapper -> this.baseContext as? OneAty

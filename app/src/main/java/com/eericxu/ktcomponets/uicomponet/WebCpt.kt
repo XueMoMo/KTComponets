@@ -2,11 +2,12 @@ package com.eericxu.ktcomponets.uicomponet
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.support.v7.widget.Toolbar
+
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.widget.Toolbar
 import com.eericxu.baselib.BaseComponent
 import com.eericxu.ktcomponets.R
 

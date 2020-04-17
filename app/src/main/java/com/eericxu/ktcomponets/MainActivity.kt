@@ -1,10 +1,10 @@
 package com.eericxu.ktcomponets
 
 import android.content.res.Configuration
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.eericxu.baselib.OneAty
 import com.eericxu.baselib.manager.OneAtyHelper
 import com.eericxu.ktcomponets.uicomponet.MainCpt
@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity(), OneAty {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         Toast.makeText(this, "Create", Toast.LENGTH_SHORT).show()
         mHelper.onCreateAty(savedInstanceState)
         mHelper.startT<MainCpt>(anim = null)
@@ -66,8 +67,9 @@ class MainActivity : AppCompatActivity(), OneAty {
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         mHelper.onConfigurationChanged(newConfig)
     }
+
 }
